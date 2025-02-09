@@ -119,7 +119,7 @@
 
         var routeControl;
 
-        // Function to get coordinates using a geocoding API
+        // Function to get coordinates and location name using a geocoding API
         function getCoordinates(address, callback) {
             var url = `https://nominatim.openstreetmap.org/search?format=json&q=${address}`;
             fetch(url)
@@ -128,7 +128,8 @@
                     if (data.length > 0) {
                         var lat = data[0].lat;
                         var lon = data[0].lon;
-                        callback(lat, lon);
+                        var name = data[0].display_name; // Get the full name of the location
+                        callback(lat, lon, name);
                     } else {
                         alert("Location not found!");
                     }
@@ -142,8 +143,8 @@
 
             if (start && end) {
                 // Get coordinates for start and end
-                getCoordinates(start, function(startLat, startLon) {
-                    getCoordinates(end, function(endLat, endLon) {
+                getCoordinates(start, function(startLat, startLon, startName) {
+                    getCoordinates(end, function(endLat, endLon, endName) {
                         if (routeControl) {
                             routeControl.setWaypoints([L.latLng(startLat, startLon), L.latLng(endLat, endLon)]);
                         } else {
@@ -156,8 +157,8 @@
                             }).addTo(map);
                         }
 
-                        // Save the route
-                        saveRoute(start, end);
+                        // Save the route with location names
+                        saveRoute(startName, endName);
                     });
                 });
             } else {
@@ -166,10 +167,16 @@
         }
 
         // Function to save the route to the list
-        function saveRoute(start, end) {
+        function saveRoute(startName, endName) {
             const savedRoutesList = document.getElementById('saved-routes-list');
             const newRoute = document.createElement('li');
-            newRoute.textContent = `Start: ${start} - End: ${end}`;
+            newRoute.textContent = `Start: ${startName} - End: ${endName}`;
+
+            // Add click event to remove route if clicked
+            newRoute.addEventListener('click', function() {
+                this.remove();
+            });
+
             savedRoutesList.appendChild(newRoute);
         }
     </script>
