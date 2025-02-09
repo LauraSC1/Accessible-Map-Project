@@ -7,31 +7,77 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
     <style>
-        /* Center the entire page */
+        /* Page layout */
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             margin: 0;
-            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Title and form stay centered */
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .form-container {
+            margin: 10px;
             text-align: center;
         }
-    
-        /* Center the map container */
-        #map {
-            height: 750px;
-            width: 800px;
-            margin: 20px auto;
+
+        /* Main container with map and saved routes side by side */
+        .main-container {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
         }
-    
-        /* Style for the form container */
-        .form-container {
-            margin: 0px;
+
+        /* Map container */
+        #map {
+            height: 650px;
+            width: 70%; /* Map takes up 70% of the width */
+            margin-right: 20px; /* Space between map and saved routes */
+            margin-left: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Saved routes container */
+        .saved-routes-container {
+            width: 30%; /* Right side takes up 30% of the width */
+            padding: 20px;
+            border: 1px solid #ccc;
+            height: 600px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Saved routes list */
+        .saved-routes-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .saved-routes-list li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .saved-routes-list li:hover {
+            background-color: #f1f1f1;
         }
     </style>
 </head>
 <body>
+
     <h1>Accessible Interactive Map</h1>
 
     <!-- Form for Start and End Locations -->
@@ -41,13 +87,25 @@
         <button onclick="getRoute()">Show Route</button>
     </div>
 
-    <div id="map"></div>
+    <!-- Main container with map and saved routes section -->
+    <div class="main-container">
+        <!-- Map container -->
+        <div id="map"></div>
+
+        <!-- Saved Routes container -->
+        <div class="saved-routes-container">
+            <h2>Saved Routes</h2>
+            <ul class="saved-routes-list" id="saved-routes-list">
+                <!-- List of saved routes will appear here -->
+            </ul>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
     <script>
         // Create a map centered at Kennesaw State University (latitude, longitude)
-        var map = L.map('map').setView([34.0390, -84.5831], 16);  // Coordinates of Kennesaw State University
+        var map = L.map('map').setView([34.0390, -84.5831], 17);  // Coordinates of Kennesaw State University & Zoom on Map 
 
         // Add OpenStreetMap tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -55,10 +113,9 @@
         }).addTo(map);
 
         // Add a marker for Kennesaw State University
-L.marker([34.0390, -84.5831]).addTo(map) 
-    .bindPopup('Kennesaw State University')
-    .openPopup();
-
+        L.marker([34.0390, -84.5831]).addTo(map)
+            .bindPopup('Kennesaw State University')
+            .openPopup();
 
         var routeControl;
 
@@ -98,12 +155,24 @@ L.marker([34.0390, -84.5831]).addTo(map)
                                 routeWhileDragging: true
                             }).addTo(map);
                         }
+
+                        // Save the route
+                        saveRoute(start, end);
                     });
                 });
             } else {
                 alert("Please enter both start and end locations.");
             }
         }
+
+        // Function to save the route to the list
+        function saveRoute(start, end) {
+            const savedRoutesList = document.getElementById('saved-routes-list');
+            const newRoute = document.createElement('li');
+            newRoute.textContent = `Start: ${start} - End: ${end}`;
+            savedRoutesList.appendChild(newRoute);
+        }
     </script>
+
 </body>
 </html>
